@@ -1,5 +1,6 @@
 [![Read Assignment Description](https://img.shields.io/badge/assignment-description-blue)](assignment.md)  
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/simply-logical/ComputationalLogic/blob/prolexa-plus/Prolexa_Plus_Demo_Notebook.ipynb)
+[![Read Report](https://img.shields.io/badge/View-Report-blue)](report.md)  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipSloan/ComputationalLogic/blob/prolexa-plus/Prolexa_Plus_Demo_Notebook.ipynb)
 
 This repository is provided for general use and as the basis for the 2021 assignment for *Computational Logic for Artificial Intelligence* (COMSM0022). 
 CDT students taking the assignment should clone this repository. 
