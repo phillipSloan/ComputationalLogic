@@ -3,7 +3,7 @@
 %		prove_question/3,		% main question-answering engine
 %		explain_question/3,		% extended version that constructs a proof tree
 %		known_rule/2,			% test if a rule can be deduced from stored rules
-%		all_rules/1,			% collect all stored rules 
+%		all_rules/1,			% collect all stored rules
 %		all_answers/2,			% everything that can be proved about a particular Proper Noun
 %	]).
 
@@ -19,7 +19,7 @@ prove_question(Query,SessionId,Answer):-
 		phrase(sentence(Clauses),AnswerAtomList),
 		atomics_to_string(AnswerAtomList," ",Answer)
 	; Answer = 'Sorry, I don\'t think this is the case'
-	).	
+	).
 
 % two-argument version that can be used in maplist/3 (see all_answers/2)
 prove_question(Query,Answer):-
@@ -29,7 +29,7 @@ prove_question(Query,Answer):-
 		phrase(sentence(Clauses),AnswerAtomList),
 		atomics_to_string(AnswerAtomList," ",Answer)
 	; Answer = ""
-	).	
+	).
 
 
 %%% Extended version of prove_question/3 that constructs a proof tree %%%
@@ -58,7 +58,7 @@ known_rule([Rule],SessionId):-
 	try((numbervars(Rule,0,_),
 	     Rule=(H:-B),
 	     add_body_to_rulebase(B,Rulebase,RB2),
-	     prove_rb(H,RB2)
+	     prove_rb1(H,RB2)
 	   )).
 
 add_body_to_rulebase((A,B),Rs0,Rs):-!,
@@ -69,20 +69,39 @@ add_body_to_rulebase(A,Rs0,[[(A:-true)]|Rs0]).
 
 %%% meta-interpreter that constructs proofs %%%
 
+% 3d argument is accumulator for proofs - used with known_rule predicate
+prove_rb1(true,_Rulebase,P,P):-!.
+prove_rb1((A,B),Rulebase,P0,P):-!,
+	find_clause((A:-C),Rule,Rulebase),
+	conj_append(C,B,D),
+    prove_rb1(D,Rulebase,[p((A,B),Rule)|P0],P).
+prove_rb1(A,Rulebase,P0,P):-
+	find_clause((A:-B),Rule,Rulebase),
+		prove_rb1(B,Rulebase,[p(A,Rule)|P0],P).
+
+% top-level version that ignores proof
+prove_rb1(Q,RB):- prove_rb1(Q,RB,[],_P).
+
+%% Added meta-interpreter with not, need both at the moment otherwise error
+%% with prolexa_cli
+%% TODO Try and get it working as one
+
 % 3d argument is accumulator for proofs
 prove_rb(true,_Rulebase,P,P):-!.
 prove_rb((A,B),Rulebase,P0,P):-!,
 	find_clause((A:-C),Rule,Rulebase),
 	conj_append(C,B,D),
-    prove_rb(D,Rulebase,[p((A,B),Rule)|P0],P).
+  prove_rb(D,Rulebase,[p((A,B),Rule)|P0],P).
 prove_rb(A,Rulebase,P0,P):-
-    find_clause((A:-B),Rule,Rulebase),
+  find_clause((A:-B),Rule,Rulebase),
 	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+prove_rb(not B,Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 
 % top-level version that ignores proof
 prove_rb(Q,RB):-
 	prove_rb(Q,RB,[],_P).
-
 
 %%% Utilities from nl_shell.pl %%%
 
@@ -99,7 +118,7 @@ transform(A,[(A:-true)]).
 
 %%% Two more commands: all_rules/1 and all_answers/2
 
-% collect all stored rules 
+% collect all stored rules
 all_rules(Answer):-
 	findall(R,prolexa:stored_rule(_ID,R),Rules),
 	maplist(rule2message,Rules,Messages),
@@ -121,4 +140,20 @@ all_answers(PN,Answer):-
 	; otherwise -> atomic_list_concat(Messages,". ",Answer)
 	).
 
+% TODO find a better way for the ;else to work... running both retracts at the moment.
+% Will remove a rule related to the one being added
+% (human(phillip):-true) will try to remove not(human(phillip):-true)
 
+% remove_conflicting_rules([Head:-Body]):-
+% 	findall(R,prolexa:stored_rule(_ID,R),Rules),
+remove_conflicting_rules([Head:-Body]):-
+	(conflicting_not_rules(Head:-Body)
+	; retractall(prolexa:stored_rule(_,[(not(Head):-Body)])),
+	     retractall(prolexa:stored_rule(_,[(Head:-not(Body))])) ).
+
+% not(human(phillip):-true) will attempt to remove (human(phillip):-true)
+conflicting_not_rules(not(Head):-Body):-
+	retractall(prolexa:stored_rule(_,[(Head:-Body)])).
+
+conflicting_not_rules(Head:-not(Body)):-
+	retractall(prolexa:stored_rule(_,[(Head:-Body)])).

@@ -21,7 +21,8 @@
 %some intial stored rules
 stored_rule(1,[(mortal(X):-human(X))]).
 stored_rule(1,[(human(peter):-true)]).
-
+% stored_rule(1,[(happy(X):-teacher(X))]).
+% stored_rule(1,[(not happy(donald):-true)]).
 
 %%% Prolexa Command Line Interface %%%
 
@@ -35,7 +36,7 @@ prolexa_cli:-
 		prolexa_cli
 	).
 
-% Main predicate that uses DCG as defined in prolexa_grammar.pl 
+% Main predicate that uses DCG as defined in prolexa_grammar.pl
 % to distinguish between sentences, questions and commands
 handle_utterance(SessionId,Utterance,Answer):-
 	write_debug(utterance(Utterance)),
@@ -43,12 +44,13 @@ handle_utterance(SessionId,Utterance,Answer):-
 	split_string(Utterance," ","",StringList),	% tokenize by spaces
 	maplist(string_lower,StringList,StringListLow),	% all lowercase
 	maplist(atom_string,UtteranceList,StringListLow),	% strings to atoms
-% A. Utterance is a sentence 
+% A. Utterance is a sentence
 	( phrase(sentence(Rule),UtteranceList),
 	  write_debug(rule(Rule)),
 	  ( known_rule(Rule,SessionId) -> % A1. It follows from known rules
 			atomic_list_concat(['I already knew that',Utterance],' ',Answer)
 	  ; otherwise -> % A2. It doesn't follow, so add to stored rules
+		  remove_conflicting_rules(Rule),
 			assertz(prolexa:stored_rule(SessionId,Rule)),
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
@@ -68,9 +70,7 @@ handle_utterance(SessionId,Utterance,Answer):-
 write_debug(Atom):-
 	write(user_error,'*** '),writeln(user_error,Atom),flush_output(user_error).
 
-
 %%%%% the stuff below is only relevant if you want to create a voice-driven Alexa skill %%%%%
-
 
 %%% HTTP server %%%
 
@@ -87,7 +87,7 @@ my_json_answer(Message,DictOut):-
 	DictOut = _{
 	      response: _{
 	      				outputSpeech: _{
-	      								type: "PlainText", 
+	      								type: "PlainText",
 	      								text: Message
 	      							},
 	      				shouldEndSession: false
@@ -110,7 +110,7 @@ handle_intent(_,_,DictOut):-
 
 
 %%% generating intents from grammar %%%
-% Run this if you want to test the skill on the 
+% Run this if you want to test the skill on the
 % Alexa developer console
 
 mk_prolexa_intents:-
@@ -172,4 +172,3 @@ mk_prolexa_intents:-
 				}
 			   ),
 		close(Stream).
-
