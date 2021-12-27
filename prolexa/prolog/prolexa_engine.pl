@@ -95,6 +95,17 @@ prove_rb((A,B),Rulebase,P0,P):-!,
 prove_rb(A,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+
+% Added to allow the body of a clause to prove a head
+prove_rb(B,Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(A,Rulebase,[p(B,Rule)|P0],P).
+
+% Added to allow negation to work
+prove_rb(not A,Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(not B,Rulebase,[p( not A,Rule)|P0],P).
+
 prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
