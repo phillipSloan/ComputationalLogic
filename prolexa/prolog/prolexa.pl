@@ -51,7 +51,7 @@ handle_utterance(SessionId,Utterance,Answer):-
 			atomic_list_concat(['I already knew that',Utterance],' ',Answer)
 	  ; otherwise -> % A2. It doesn't follow, so add to stored rules
 		  remove_conflicting_rules(Rule),
-			% assertz(prolexa:stored_rule(SessionId,Rule)),
+			assertz(prolexa:stored_rule(SessionId,Rule)),
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
 % B. Utterance is a question that can be answered
