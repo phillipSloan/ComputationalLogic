@@ -80,7 +80,41 @@ prove_rb(not B,Rulebase,P0,P):-
 ```
 This code was derived from the existing and new standard prove_rb clauses. Two versions are used to allow both a head or a body to be unified by the meta-interpreter. It works by trying to prove the opposite position, so inverting what it is trying to prove.
 
-Finally, to prevent the code to cycle in infinite recursive loops, a counter was added.
+Finally, it was noticed that the new meta-interpreter only worked when the predicate succeeded, otherwise it would fall into an infinite recursive loop. To prevent this, a counter was added similar to what is found in the predicate `anti_unify_args` from 9.1 of too simply logical. This gives us the final meta-interpreter:
+
+```prolog
+prove_rb(_N, true,_Rulebase,P,P):-!.
+prove_rb(0, _A,_Rulebase,[],[]):-!.
+
+prove_rb(N, (A,B),Rulebase,P0,P):-!,
+  N>0,N1 is N-1,
+	find_clause((A:-C),Rule,Rulebase),
+	conj_append(C,B,D),
+  prove_rb(N1, D,Rulebase,[p((A,B),Rule)|P0],P).
+prove_rb(N, A,Rulebase,P0,P):-
+	N>0,N1 is N-1,
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(N1, B,Rulebase,[p(A,Rule)|P0],P).
+
+prove_rb(N, B,Rulebase,P0,P):-
+	N>0,N1 is N-1,
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(N1, A,Rulebase,[p(B,Rule)|P0],P).
+
+prove_rb(N, not A,Rulebase,P0,P):-
+	N>0,N1 is N-1,
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(N1, not B,Rulebase,[p( not A,Rule)|P0],P).
+
+prove_rb(N, not B,Rulebase,P0,P):-
+	N>0,N1 is N-1,
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(N1, not A,Rulebase,[p(not B,Rule)|P0],P).
+
+% top-level version that ignores proof
+prove_rb(Q,RB):-
+	prove_rb(2, Q,RB,[],_P).
+```
 
 ### Command Line Code
 The majority of work done for this assignment was performed using the prolexa command line interface. When prolexa stored_rules are instantiated using prolexa_cli, it is currently possible to put two conflicting rules into the rule-base, such as:
