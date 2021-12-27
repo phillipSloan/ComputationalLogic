@@ -1,5 +1,6 @@
 # Report for COMSM0022 Computational Logic for Artificial Intelligence (2021)
 
+[![Open Report In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipSloan/ComputationalLogic/blob/prolexa-plus/Report%20Notebook.ipynb)
 ## Authors
 [Phillip Sloan](https://github.com/phillipSloan) and [Jonathan Erksine](https://github.com/jmerskine1)
 
