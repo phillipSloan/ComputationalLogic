@@ -1,4 +1,3 @@
-[![Read Assignment Description](https://img.shields.io/badge/assignment-description-blue)](assignment.md)  
 [![Read Report](https://img.shields.io/badge/View-Report-blue)](report.md)  
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipSloan/ComputationalLogic/blob/prolexa-plus/Report_Notebook.ipynb)
 
