@@ -48,8 +48,10 @@ sword --> [].
 sword --> [that].
 
 % most of this follows Simply Logical, Chapter 7
+% This allows "Every <noun> is not <verb>" to work
 sentence1([(H:-not(B))]) --> determiner(N,M1,M2,[(H:-B)]),noun(N,M1),verb_phrase(N,not(M2)).
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
+% This allows "<noun> is <verb>" to work
 sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 
@@ -81,6 +83,8 @@ qword --> [].
 %qword --> [if].
 %qword --> [whether].
 question1(Q) --> [who],verb_phrase(s,_X=>Q).
+% This allows "who is not a <noun>" to be answered
+question1(not(Q)) --> [who],verb_phrase(s,not(_X=>Q).
 question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
 question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
 %question1((Q1,Q2)) --> [are,some],noun(p,sk=>Q1),
