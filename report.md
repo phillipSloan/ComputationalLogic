@@ -80,6 +80,7 @@ prove_rb(not B,Rulebase,P0,P):-
 ```
 This code was derived from the existing and new standard prove_rb clauses. Two versions are used to allow both a head or a body to be unified by the meta-interpreter. It works by trying to prove the opposite position, so inverting what it is trying to prove.
 
+Finally, to prevent the code to cycle in infinite recursive loops, a counter was added.
 
 ### Command Line Code
 The majority of work done for this assignment was performed using the prolexa command line interface. When prolexa stored_rules are instantiated using prolexa_cli, it is currently possible to put two conflicting rules into the rule-base, such as:
