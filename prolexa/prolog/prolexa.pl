@@ -21,8 +21,8 @@
 %some intial stored rules
 stored_rule(1,[(mortal(X):-human(X))]).
 stored_rule(1,[(human(peter):-true)]).
-stored_rule(1,[(happy(X):-teacher(X))]).
-stored_rule(1,[(not happy(donald):-true)]).
+% stored_rule(1,[(happy(X):-teacher(X))]).
+% stored_rule(1,[(not happy(donald):-true)]).
 
 %%% Prolexa Command Line Interface %%%
 
@@ -51,7 +51,7 @@ handle_utterance(SessionId,Utterance,Answer):-
 			atomic_list_concat(['I already knew that',Utterance],' ',Answer)
 	  ; otherwise -> % A2. It doesn't follow, so add to stored rules
 		  remove_conflicting_rules(Rule),
-			assertz(prolexa:stored_rule(SessionId,Rule)),
+			% assertz(prolexa:stored_rule(SessionId,Rule)),
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
 % B. Utterance is a question that can be answered
