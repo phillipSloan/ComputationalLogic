@@ -18,9 +18,9 @@
 :-prompt(_Old,'prolexa> ').
 
 
-%some intial stored rules
-stored_rule(1,[(mortal(X):-human(X))]).
-stored_rule(1,[(human(peter):-true)]).
+% some intial stored rules - commented out for notebook demonstration
+% stored_rule(1,[(mortal(X):-human(X))]).
+% stored_rule(1,[(human(peter):-true)]).
 % stored_rule(1,[(happy(X):-teacher(X))]).
 % stored_rule(1,[(not happy(donald):-true)]).
 
