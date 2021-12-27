@@ -25,7 +25,7 @@ Which uses the following rule:
 ```prolog
 stored_rule(1,[(happy(X):-teacher(X))]).
 ```
-I thought it was strange that the meta-interpreter could not handle the second case. Looking at the existing prove_rb meta interpreter:
+We thought it was strange that the meta-interpreter could not handle the second case. Looking at the existing prove_rb meta interpreter:
 
 ```prolog
 prove_rb(true,_Rulebase,P,P):-!.
