@@ -66,6 +66,7 @@ sentence1([(H:-not(B))]) --> determiner(N,M1,M2,[(H:-B)]),noun(N,M1),verb_phrase
 sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
+verb_phrase(s,not(M)) --> [not],property(s,M).
 
 question1(not(Q)) --> [who],verb_phrase(s,not(_X=>Q)).
 ```
