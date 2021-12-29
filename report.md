@@ -5,10 +5,14 @@
 [Phillip Sloan](https://github.com/phillipSloan) and [Jonathan Erksine](https://github.com/jmerskine1)
 
 ## Contents
-1. [Meta-interpreter](#metainterpreter)
-2. [Negation](#negation)
-3. [Command Line Code](#command-line-code)
-4. [Limitations](#limitations)
+1. [Introduction](#introduction)
+2. [Meta-interpreter](#metainterpreter)
+3. [Negation](#negation)
+4. [Command Line Code](#command-line-code)
+5. [Limitations](#limitations)
+
+### Introduction
+This method demonstrates our approach to this assignment, walking through how we implemented negation and some other command line code. It seeks to explain our thought process, which was wrong at certain points, causing unwanted proofs from the meta-interpreter. There are several snippets of code throughout this report of how our code was created, with the Colab notebook demonstrating the final implementation. A link to it can be found at the top of this report.
 
 ### Metainterpreter
 When trying to understand the meta interpreter it was realised that the prove_rb predicate only worked one way, For example, the current meta-interpreter is able to solve the following request:
@@ -78,9 +82,9 @@ prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 ```
-This code was derived from the existing and new standard prove_rb clauses. Two versions are used to allow both a head or a body to be unified by the meta-interpreter. It works by trying to prove the opposite position, so inverting what it is trying to prove.
+This code was derived from the existing and new standard prove_rb clauses. Two versions are used to allow both a head or a body to be unified by the meta-interpreter. It works by trying to prove the opposite position, so inverting what it is trying to prove. An example would be if its trying to prove `happy(X):-teacher(X)` it will seek to prove `not(teacher(X)):-not(happy(x))`.
 
-Finally, it was noticed that the new meta-interpreter only worked when the predicate succeeded, otherwise it would fall into an infinite recursive loop. To prevent this, a counter was added similar to what is found in the predicate `anti_unify_args` from 9.1 of too simply logical. This gives us the final meta-interpreter:
+It was noticed that the new meta-interpreter only worked when the predicate succeeded, otherwise it would fall into an infinite recursive loop. To prevent this, a counter was added similar to what is found in the predicate `anti_unify_args` from 9.1 of too simply logical. This gives us the meta-interpreter:
 
 ```prolog
 prove_rb(_N, true,_Rulebase,P,P):-!.
@@ -116,6 +120,67 @@ prove_rb(Q,RB):-
 	prove_rb(2, Q,RB,[],_P).
 ```
 
+However, when discussing this meta-interpreter we realised there was a flaw in our intial logic. We should not be trying to prove `donald is a teacher` from `stored_rule(1,[(happy(X):-teacher(X))]).` as it doesn't make follow logically from it.  The rule means `Every teacher is happy`. Teachers are a subset of happy X's, but the rule doesn't provide the information that all happy X's are teachers. The current meta-interpret was not logically sound, which led us to cutting down the metainterpreter into it's final, more compact state:
+
+```prolog
+prove_rb(true,_Rulebase,P,P):-!.
+
+prove_rb((A,B),Rulebase,P0,P):-!,
+	find_clause((A:-C),Rule,Rulebase),
+	conj_append(C,B,D),
+  prove_rb(D,Rulebase,[p((A,B),Rule)|P0],P).
+
+prove_rb(A,Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+
+% Added to allow negation to work
+prove_rb(not B,Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
+
+% top-level version that ignores proof
+prove_rb(Q,RB):-
+	prove_rb(Q,RB,[],_P).
+```
+
+The meta-interpreter works, proving from A->B or proving its inverse when asked to prove negation. Another issue was found with the interpreter, in that it did not currently work with handle_utterances questions section. questions such as:
+>"is donald a teacher".
+
+Did not work, which can be seen in the log below:
+
+```
+prolexa> "tell me everything you know".
+*** utterance(tell me everything you know)
+*** goal(all_rules(_9430))
+*** answer(every human is mortal. every teacher is happy. donald is not happy. peter is mortal)
+every human is mortal. every teacher is happy. donald is not happy. peter is mortal
+prolexa> "is donald a teacher".
+*** utterance(is donald a teacher)
+*** query(teacher(donald))
+*** answer(Sorry, I don't think this is the case)
+Sorry, I don't think this is the case
+```
+
+To get questions like this working with prolexa we needed to change the prove_question which is shown below:
+
+```prolog
+prove_question(Query,SessionId,Answer):-
+    findall(R,prolexa:stored_rule(SessionId,R),Rulebase),     % create a list of all the rules and store them in RuleBase
+    ( prove_rb(Query,Rulebase) ->
+        transform(Query,Clauses),
+        phrase(sentence(Clauses),AnswerAtomList),
+        atomics_to_string(AnswerAtomList," ",Answer)
+    ; prove_rb(not Query,Rulebase) ->
+        transform(not Query,Clauses),
+        phrase(sentence(Clauses),AnswerAtomList),
+        atomics_to_string(AnswerAtomList," ",Answer)
+    ; Answer = 'Sorry, I don\'t think this is the case'
+    ).
+```
+
+The working example of this question can be found in the notebook.
+
 ### Command Line Code
 The majority of work done for this assignment was performed using the prolexa command line interface. When prolexa stored_rules are instantiated using prolexa_cli, it is currently possible to put two conflicting rules into the rule-base, such as:
   ```prolog
@@ -143,4 +208,4 @@ conflicting_not_rules(Head:-not(Body)):-
 For example, if `happy(donald):-true.` is being added, it will seek to remove any versions of `not(happy(donald)):-true.` from the rule store.
 
 ### Limitations
-When using Prolexa Plus it has been noticed that sometimes in some cases, it will add stored rule twice. This issue does not occur with standard prolexa, so I am assuming it is some conflict between the two.
+When using Prolexa Plus it has been noticed that sometimes in some cases, it will add stored rule twice. This issue does not occur with standard prolexa, so we are assuming it is a conflict between the two?
