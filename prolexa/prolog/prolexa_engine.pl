@@ -13,13 +13,17 @@
 %%% Main question-answering engine adapted from nl_shell.pl %%%
 
 prove_question(Query,SessionId,Answer):-
-	findall(R,prolexa:stored_rule(SessionId,R),Rulebase),
-	( prove_rb(Query,Rulebase) ->
-		transform(Query,Clauses),
-		phrase(sentence(Clauses),AnswerAtomList),
-		atomics_to_string(AnswerAtomList," ",Answer)
-	; Answer = 'Sorry, I don\'t think this is the case'
-	).
+    findall(R,prolexa:stored_rule(SessionId,R),Rulebase),     % create a list of all the rules and store them in RuleBase
+    ( prove_rb(Query,Rulebase) ->
+        transform(Query,Clauses),
+        phrase(sentence(Clauses),AnswerAtomList),
+        atomics_to_string(AnswerAtomList," ",Answer)
+    ; prove_rb(not(Query),Rulebase) ->
+        transform(not Query,Clauses),
+        phrase(sentence(Clauses),AnswerAtomList),
+        atomics_to_string(AnswerAtomList," ",Answer)
+    ; Answer = 'Sorry, I don\'t think this is the case'
+    ).
 
 % two-argument version that can be used in maplist/3 (see all_answers/2)
 prove_question(Query,Answer):-
@@ -28,6 +32,10 @@ prove_question(Query,Answer):-
 		transform(Query,Clauses),
 		phrase(sentence(Clauses),AnswerAtomList),
 		atomics_to_string(AnswerAtomList," ",Answer)
+	; prove_rb(not(Query),Rulebase) ->
+			transform(not Query,Clauses),
+			phrase(sentence(Clauses),AnswerAtomList),
+			atomics_to_string(AnswerAtomList," ",Answer)
 	; Answer = ""
 	).
 
@@ -121,6 +129,7 @@ prove_rb(N, not B,Rulebase,P0,P):-
 % top-level version that ignores proof
 prove_rb(Q,RB):-
 	prove_rb(2, Q,RB,[],_P).
+
 
 %%% Utilities from nl_shell.pl %%%
 

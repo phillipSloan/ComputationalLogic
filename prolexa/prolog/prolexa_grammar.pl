@@ -21,6 +21,7 @@ pred(mortal,  1,[a/mortal,n/mortal]).
 % Added for negation
 pred(happy,   1,[a/happy]).
 pred(teacher, 1,[n/teacher]).
+pred(student, 1,[n/student]).
 
 
 pred2gr(P,1,C/W,X=>Lit):-

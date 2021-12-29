@@ -22,7 +22,7 @@
 % stored_rule(1,[(mortal(X):-human(X))]).
 % stored_rule(1,[(human(peter):-true)]).
 % stored_rule(1,[(happy(X):-teacher(X))]).
-% stored_rule(1,[(not happy(donald):-true)]).
+% stored_rule(1,[(not(happy(donald)):-true)]).
 
 %%% Prolexa Command Line Interface %%%
 
