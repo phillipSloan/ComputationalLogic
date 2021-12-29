@@ -18,7 +18,7 @@ prove_question(Query,SessionId,Answer):-
         transform(Query,Clauses),
         phrase(sentence(Clauses),AnswerAtomList),
         atomics_to_string(AnswerAtomList," ",Answer)
-    ; prove_rb(not(Query),Rulebase) ->
+    ; prove_rb(not Query,Rulebase) ->
         transform(not Query,Clauses),
         phrase(sentence(Clauses),AnswerAtomList),
         atomics_to_string(AnswerAtomList," ",Answer)
@@ -32,7 +32,7 @@ prove_question(Query,Answer):-
 		transform(Query,Clauses),
 		phrase(sentence(Clauses),AnswerAtomList),
 		atomics_to_string(AnswerAtomList," ",Answer)
-	; prove_rb(not(Query),Rulebase) ->
+	; prove_rb(not Query,Rulebase) ->
 			transform(not Query,Clauses),
 			phrase(sentence(Clauses),AnswerAtomList),
 			atomics_to_string(AnswerAtomList," ",Answer)
@@ -43,7 +43,7 @@ prove_question(Query,Answer):-
 %%% Extended version of prove_question/3 that constructs a proof tree %%%
 explain_question(Query,SessionId,Answer):-
 	findall(R,prolexa:stored_rule(SessionId,R),Rulebase),
-	( prove_rb(2, Query,Rulebase,[],Proof) ->
+	( prove_rb(Query,Rulebase,[],Proof) ->
 		maplist(pstep2message,Proof,Msg),
 		phrase(sentence1([(Query:-true)]),L),
 		atomic_list_concat([therefore|L]," ",Last),
@@ -96,43 +96,28 @@ prove_rb1(Q,RB):- prove_rb1(Q,RB,[],_P).
 
 % 3d argument is accumulator for proofs
 
-prove_rb(_N, true,_Rulebase,P,P):-!.
-prove_rb(0, _A,_Rulebase,[],[]):-!.
+prove_rb(true,_Rulebase,P,P):-!.
 
-prove_rb(N, (A,B),Rulebase,P0,P):-!,
-  N>0,N1 is N-1,
+prove_rb((A,B),Rulebase,P0,P):-!,
 	find_clause((A:-C),Rule,Rulebase),
 	conj_append(C,B,D),
-  prove_rb(N1, D,Rulebase,[p((A,B),Rule)|P0],P).
-prove_rb(N, A,Rulebase,P0,P):-
-	N>0,N1 is N-1,
-  find_clause((A:-B),Rule,Rulebase),
-	prove_rb(N1, B,Rulebase,[p(A,Rule)|P0],P).
+  prove_rb(D,Rulebase,[p((A,B),Rule)|P0],P).
 
-% Added to allow the body of a clause to prove a head.
-prove_rb(N, B,Rulebase,P0,P):-
-	N>0,N1 is N-1,
+prove_rb(A,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
-	prove_rb(N1, A,Rulebase,[p(B,Rule)|P0],P).
+	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
 
 % Added to allow negation to work
-prove_rb(N, not A,Rulebase,P0,P):-
-	N>0,N1 is N-1,
+prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
-	prove_rb(N1, not B,Rulebase,[p( not A,Rule)|P0],P).
-
-prove_rb(N, not B,Rulebase,P0,P):-
-	N>0,N1 is N-1,
-  find_clause((A:-B),Rule,Rulebase),
-	prove_rb(N1, not A,Rulebase,[p(not B,Rule)|P0],P).
+	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 
 % top-level version that ignores proof
 prove_rb(Q,RB):-
-	prove_rb(2, Q,RB,[],_P).
+	prove_rb(Q,RB,[],_P).
 
 
 %%% Utilities from nl_shell.pl %%%
-
 find_clause(Clause,Rule,[Rule|_Rules]):-
 	copy_term(Rule,[Clause]).	% do not instantiate Rule
 find_clause(Clause,Rule,[_Rule|Rules]):-
