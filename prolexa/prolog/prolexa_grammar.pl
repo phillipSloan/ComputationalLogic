@@ -20,7 +20,7 @@ pred(human,   1,[a/human,n/human]).
 pred(mortal,  1,[a/mortal,n/mortal]).
 % Added for negation
 pred(happy,   1,[a/happy]).
-pred(teacher, 1,[n/teacher]).
+pred(teacher, 1,[n/teacher, a/teacher]).
 pred(student, 1,[n/student]).
 
 
@@ -58,6 +58,7 @@ sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
+verb_phrase(s,not(M)) --> [not],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
 
@@ -87,6 +88,7 @@ question1(Q) --> [who],verb_phrase(s,_X=>Q).
 % This allows "who is not a <noun>" to be answered
 question1(not(Q)) --> [who],verb_phrase(s,not(_X=>Q)).
 question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
+question1(not(Q)) --> [is],proper_noun(N,X),verb_phrase(N,not(X=>Q)).
 question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
 %question1((Q1,Q2)) --> [are,some],noun(p,sk=>Q1),
 %					  property(p,sk=>Q2).
