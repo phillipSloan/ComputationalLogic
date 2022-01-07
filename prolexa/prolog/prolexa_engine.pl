@@ -49,6 +49,12 @@ explain_question(Query,SessionId,Answer):-
 		atomic_list_concat([therefore|L]," ",Last),
 		append(Msg,[Last],Messages),
 		atomic_list_concat(Messages,"; ",Answer)
+	; prove_rb(not(Query),Rulebase,[],Proof) ->
+		maplist(pstep2message,Proof,Msg),
+		phrase(sentence1([(not(Query):-true)]),L),
+		atomic_list_concat([therefore|L]," ",Last),
+		append(Msg,[Last],Messages),
+		atomic_list_concat(Messages," ; ",Answer)
 	; Answer = 'Sorry, I don\'t think this is the case'
 	).
 
@@ -108,9 +114,14 @@ prove_rb(A,Rulebase,P0,P):-
 	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
 
 % Added to allow negation to work
-prove_rb(not B,Rulebase,P0,P):-
+%prove_rb(not B,Rulebase,P0,P):-
+%  find_clause((A:-B),Rule,Rulebase),
+%	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
+
+prove_rb(not A,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
-	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
+	prove_rb(not B,Rulebase,[p( not A,Rule)|P0],P).
+
 
 % top-level version that ignores proof
 prove_rb(Q,RB):-
