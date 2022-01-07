@@ -56,11 +56,18 @@ sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
 sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 
+% putting together response for if, then rule
+sentence1(C) --> reverse_verb_phrase(N,M1), determiner_reverse(N,M1,M2,C),  noun(N,M2).
+
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
 verb_phrase(s,not(M)) --> [not],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
+
+% allows us of "if " as syntax
+reverse_verb_phrase(s,M) --> [if],property(s,M).
+reverse_verb_phrase(p,M) --> [if],property(p,M).
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
@@ -70,6 +77,10 @@ determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
 % determiner(p,X=>B,X=>H,[(H:-B)]) --> [].
 %determiner(p, sk=>H1, sk=>H2, [(H1:-true),(H2 :- true)]) -->[some].
+
+% operator for trailing determiner
+determiner_reverse(s,X=>B,X=>H,[(H:-B)]) --> [then].
+determiner_reverse(p,X=>B,X=>H,[(H:-B)]) --> [then].
 
 proper_noun(s,peter) --> [peter].
 proper_noun(s, phillip) --> [phillip].
