@@ -14,12 +14,11 @@ verb_phrase(s,not(M)) --> [is],[not],property(s,M).
 verb_phrase(s,not(M)) --> [not],property(s,M).
 ```
 Introducing "not(M)" into the verb_phrase requires us to extend our definition of sentence1 to include negative cases:
-
 ```
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2). 
 sentence1([(H:-not(B))]) --> determiner(N,M1,M2,[(H:-B)]),noun(N,M1),verb_phrase(N,not(M2)).
 ```
-and for proper nouns:
+This implements a special case where, if the verb phrase is negative, we pass the negative rule but apply the determiner of the positive case. The modification is more straight forward for proper nouns:
 ```
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
