@@ -68,7 +68,7 @@ conflicting_not_rules(not(Head):-Body):-
 conflicting_not_rules(Head:-not(Body)):-
 	retractall(prolexa:stored_rule(_,[(Head:-Body)])).
 ```
-This new function is called in prolexa.pl when a new rule is added
+This new function searching the current rulebase for rules which are in direct conflict with a newly instantiated rule and removes them from the rulebase. This function is called from prolexa.pl when a new rule is added.
 ```
 % A. Utterance is a sentence
 	( phrase(sentence(Rule),UtteranceList),
@@ -85,3 +85,28 @@ This new function is called in prolexa.pl when a new rule is added
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
 ```
+This can be observed by the following:
+```
+user: "forget everything".
+prolexa: I am a blank slate
+
+user: "donald is happy".
+prolexa: I will remember that donald is happy
+
+user: "donald is not happy".
+prolexa: I will remember that donald is not happy
+
+user: "tell me everything".
+prolexa: donald is not happy
+```
+Prolexa can now correctly store rules with confliction through negation, but we can still not infer negated answers from positive literals, or vice versa. For example:
+```
+user: "donald is not happy".
+prolexa: I will remember that donald is not happy
+
+user: "is donald happy"
+prolexa: Sorry, I don't think this is the case
+```
+The question answering engine will attempt to prove the query, and if it cannot will provide a response indicating that the answer is not found in the knowledge base ("Sorry, I don't..."). However, in this case, clearly "Is donald happy?" should have an answer as we know that Donald is not happy. To remedy this, we add an extra step in the question answering process to check if the negative of a query can be proven. 
+
+
