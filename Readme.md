@@ -29,6 +29,16 @@ sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 
 Here we have only dealt with the singular case, so phrases like "All teachers are not happy" aren't currently handled by Prolog - this can be replaced with "Every teacher is not happy" so we will not attempt to extend the grammar for the purposes of this demonstration. 
 
+Finally we need to extension the question interpreter to receive "not" within a query
+
+```
+question1(Q) --> [who],verb_phrase(s,_X=>Q).
+question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
+question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
+
+question1(not(Q)) --> [who],verb_phrase(s,not(_X=>Q)).
+question1(not(Q)) --> [is],proper_noun(N,X),verb_phrase(N,not(X=>Q)).
+```
 ---
 #### Negation - Reasoning
 ---
