@@ -9,7 +9,7 @@ In it's current state, Prolexa cannot handle negation semantically, or in terms 
 
 ---
 #### Negation - Grammar
-
+---
 To implement negation grammatically we have to modify prolexa_grammar.pl to include negative verb phrases:
 ```
 verb_phrase(s,M) --> [is],property(s,M).
@@ -28,9 +28,10 @@ sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 ```
 
 Here we have only dealt with the singular case, so phrases like "All teachers are not happy" aren't currently handled by Prolog - this can be replaced with "Every teacher is not happy" so we will not attempt to extend the grammar for the purposes of this demonstration. 
+
 ---
 #### Negation - Reasoning
-
+---
 We can now handle phrases like "Donald is not happy", but they have no bearing with respect to reasoning. This can be observed if we input some conflicting information:
 
 ```
