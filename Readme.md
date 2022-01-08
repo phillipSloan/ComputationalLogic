@@ -7,6 +7,7 @@ In this coursework we attempt to extend the reasoning capabilities of Prolexa to
 
 In it's current state, Prolexa cannot handle negation semantically, or in terms of reasoning e.g. given a statement "Tweety does not fly" or "Tweety is not a bird", Prolexa will fail to interpret the natural language of the query due to the unknown effects of "not" within sentence structure, and it cannot associate "not" with any meaning regarding a clause or set of clauses.
 
+---
 #### Negation - Grammar
 
 To implement negation grammatically we have to modify prolexa_grammar.pl to include negative verb phrases:
@@ -27,7 +28,7 @@ sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 ```
 
 Here we have only dealt with the singular case, so phrases like "All teachers are not happy" aren't currently handled by Prolog - this can be replaced with "Every teacher is not happy" so we will not attempt to extend the grammar for the purposes of this demonstration. 
-
+---
 #### Negation - Reasoning
 
 We can now handle phrases like "Donald is not happy", but they have no bearing with respect to reasoning. This can be observed if we input some conflicting information:
