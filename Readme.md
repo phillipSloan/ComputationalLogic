@@ -9,8 +9,8 @@ In it's current state, Prolexa cannot handle negation semantically, or in terms 
 
 To implement negation grammatically 
 
-"""
+```
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
 verb_phrase(s,not(M)) --> [not],property(s,M).
-"""
+```
