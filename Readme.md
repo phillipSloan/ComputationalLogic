@@ -76,7 +76,11 @@ This new function is called in prolexa.pl when a new rule is added
 	  ( known_rule(Rule,SessionId) -> % A1. It follows from known rules
 			atomic_list_concat(['I already knew that',Utterance],' ',Answer)
 	  ; otherwise -> % A2. It doesn't follow, so add to stored rules
-		  `remove_conflicting_rules(Rule),`
+```
+```
+		        remove_conflicting_rules(Rule),
+```
+```
 			assertz(prolexa:stored_rule(SessionId,Rule)),
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
