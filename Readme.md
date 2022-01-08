@@ -29,8 +29,7 @@ sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 
 Here we have only dealt with the singular case, so phrases like "All teachers are not happy" aren't currently handled by Prolog - this can be replaced with "Every teacher is not happy" so we will not attempt to extend the grammar for the purposes of this demonstration. 
 
-Finally we need to extension the question interpreter to receive "not" within a query
-
+Finally, we need to extend the question interpreter to understand "not" within a query:
 ```
 question1(Q) --> [who],verb_phrase(s,_X=>Q).
 question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
@@ -56,7 +55,29 @@ prolexa: I will remember that donald is not happy
 user: "tell me everything".
 prolexa: donald is happy. donald is not happy
 ```
-Not only does Prolexa fail to recognize,
+Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a predicate which removes conflicting rules to prolexa_engine.pl :
+```
+remove_conflicting_rules([Head:-Body]):-
+	(conflicting_not_rules(Head:-Body)
+	; retractall(prolexa:stored_rule(_,[(not(Head):-Body)])),
+	     retractall(prolexa:stored_rule(_,[(Head:-not(Body))])) ).
 
+conflicting_not_rules(not(Head):-Body):-
+	retractall(prolexa:stored_rule(_,[(Head:-Body)])).
 
-
+conflicting_not_rules(Head:-not(Body)):-
+	retractall(prolexa:stored_rule(_,[(Head:-Body)])).
+```
+This new function is called in prolexa.pl when a new rule is added
+```
+% A. Utterance is a sentence
+	( phrase(sentence(Rule),UtteranceList),
+	  write_debug(rule(Rule)),
+	  ( known_rule(Rule,SessionId) -> % A1. It follows from known rules
+			atomic_list_concat(['I already knew that',Utterance],' ',Answer)
+	  ; otherwise -> % A2. It doesn't follow, so add to stored rules
+		  `remove_conflicting_rules(Rule),`
+			assertz(prolexa:stored_rule(SessionId,Rule)),
+			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
+	  )
+```
