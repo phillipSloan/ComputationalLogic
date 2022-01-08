@@ -1,5 +1,3 @@
-[![Read Report](https://img.shields.io/badge/View-Report-blue)](report.md)  
-
 This repository is provided for general use and as the basis for the 2021 assignment for *Computational Logic for Artificial Intelligence* (COMSM0022). 
 CDT students taking the assignment should clone this repository. 
 The two buttons above give more details about the assignment, and enable running the Prolexa assistant in the browser using Google Colab. 
