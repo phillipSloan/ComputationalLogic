@@ -18,10 +18,11 @@ Introducing "not(M)" into the verb_phrase requires us to extend our definition o
 ```
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2). 
 sentence1([(H:-not(B))]) --> determiner(N,M1,M2,[(H:-B)]),noun(N,M1),verb_phrase(N,not(M2)).
-
-% This allows "<noun> is <verb>" to work
-%sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
+```
+and for proper nouns:
+```
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
+sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 ```
 
 Here we have only dealt with the singular case, so phrases like "All teachers are not happy" aren't currently handled by Prolog - this can be replaced with "Every teacher is not happy" so we will not attempt to extend the grammar for the purposes of this demonstration. We can now handle phrases like "Donald is not happy", but they have no bearing with respect to reasoning. This can be observed if we input some conflicting information:
