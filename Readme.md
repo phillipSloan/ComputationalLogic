@@ -52,10 +52,11 @@ prolexa: I will remember that donald is happy
 
 user: "donald is not happy".
 prolexa: I will remember that donald is not happy
+
 user: "tell me everything".
 prolexa: donald is happy. donald is not happy
 ```
-Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a predicate which removes conflicting rules to prolexa_engine.pl :
+Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a function which removes conflicting rules to prolexa_engine.pl :
 ```
 remove_conflicting_rules([Head:-Body]):-
 	(conflicting_not_rules(Head:-Body)
@@ -85,6 +86,8 @@ This new function takes a rule and searches the current rulebase to remove any w
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
 ```
+---
+
 Removal of conflicting rules can be observed by the following:
 ```
 user: "forget everything".
@@ -99,7 +102,7 @@ prolexa: I will remember that donald is not happy
 user: "tell me everything".
 prolexa: donald is not happy
 ```
-Prolexa can now correctly store rules with confliction through negation, but we can still not infer negated answers from positive literals, or vice versa. For example:
+Prolexa can now correctly store rules with confliction through negation, but we can still not infer answers to negated questions from positive literals, or vice versa. For example:
 ```
 user: "donald is not happy".
 prolexa: I will remember that donald is not happy
@@ -111,7 +114,7 @@ The question answering engine will attempt to prove the query, and if it cannot 
 
 However, in this case, clearly "Is donald happy?" should have an answer as we know that Donald is not happy. To remedy this, we add an extra step in the question answering process to check if the negative of a query can be proven. 
 
-This requires modification of prove_question/2, prove_question/3 and explain_question within prolog_engine.pl
+This requires modification of prove_question/2, prove_question/3 and explain_question to duplicate the first check but with the negative version of the query.
 
 ```
 %%% Main question-answering engine adapted from nl_shell.pl %%%
@@ -186,3 +189,38 @@ prolexa: donald is not happy
 ```
 The assignment asks us to prove:
 > Every teacher is happy. Donald is not happy. Therefore, Donald is not a teacher.
+
+This test fails, yielding the following dialogue:
+```
+user: "tell me everything".
+prolexa: donald is not happy. every teacher is happy
+
+user: "is donald a teacher".
+prolexa: Sorry, I don't think this is the case
+```
+Clearly, there is an issue with the method of explanation. If donald is happy, then we can not say for certain whether he is or is not a teacher. However, knowing that donald is not happy implies that he cannot be a teacher, as all teachers are happy. Prolexa must access this information by establishing that if something is not something 
+
+Whereas for a positive term, e.g. teacger(d0nald) the proof tree will search for any set of rules and ground truths which indicate that donald is a teacher e.g. 
+> teacher(donald):-true 
+or
+> teacher(X):-happy(X), happy(donald):-true 
+We now have to add a step which checks for the 
+
+which goes beyond our attempt at negation. Turning our attention to the prove_rb meta-interpreter:
+```
+prove_rb(true,_Rulebase,P,P):-!.
+prove_rb((A,B),Rulebase,P0,P):-!,
+    find_clause((A:-C),Rule,Rulebase),
+    conj_append(C,B,D),
+    prove_rb(D,Rulebase,[p((A,B),Rule)|P0],P).
+prove_rb(A,Rulebase,P0,P):-
+    find_clause((A:-B),Rule,Rulebase),
+    prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+```
+```ruby
+prove_rb(not B,Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
+```
+
+When looking at the final predicate, it can be seen that prove_rb/4 tries to unify B with a body of a stored rule whos head matches the given A. It will cycle through all stored rules and try and find a matching rule, but in the second case this will not happen, as it will be trying to match teacher(donald) to happy(X), so it fails. We realised that a new predicate needed to be created, that mirrored the existing one and unified the head A, given a body B. The following predicate was added to prove_rb/4.
