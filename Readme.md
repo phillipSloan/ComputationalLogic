@@ -10,7 +10,10 @@ In it's current state, Prolexa cannot handle negation semantically, or in terms 
 ---
 #### Negation - Grammar
 ---
-To implement negation grammatically we have to modify prolexa_grammar.pl to include negated verb phrases:
+To implement negation grammatically we have to modify prolexa_grammar.pl to define a "not" operator, (taken from Simply Logical 8.1) and to include negated verb phrases:
+```
+:-op(900,fy,not).
+```
 ```
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
@@ -21,7 +24,7 @@ Introducing "not(M)" into the verb_phrase requires us to extend our definition o
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2). 
 sentence1([(H:-not(B))]) --> determiner(N,M1,M2,[(H:-B)]),noun(N,M1),verb_phrase(N,not(M2)).
 ```
-This implements a special case where, if the verb phrase is negative, we pass the negative rule but borrow the determiner of the positive case. The modification is more straight forward for proper nouns:
+This implements a special case where, if the verb phrase is negative, we pass the negative rule but borrow the standard determiner from the positive case. The modification is more straight forward for proper nouns:
 ```
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
@@ -56,7 +59,7 @@ prolexa: I will remember that donald is not happy
 user: "tell me everything".
 prolexa: donald is happy. donald is not happy
 ```
-Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a function which removes conflicting rules. The following is added to prolexa_engine.pl :
+Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a function which takes a rule and searches the current rulebase to remove any which are in direct conflict. The following is added to prolexa_engine.pl :
 ```
 remove_conflicting_rules([Head:-Body]):-
 	(conflicting_not_rules(Head:-Body)
@@ -69,7 +72,7 @@ conflicting_not_rules(not(Head):-Body):-
 conflicting_not_rules(Head:-not(Body)):-
 	retractall(prolexa:stored_rule(_,[(Head:-Body)])).
 ```
-This new function takes a rule and searches the current rulebase to remove any which are in direct conflict. This function is called from prolexa.pl when a new rule is added.
+This function is called from prolexa.pl when a new rule is added.
 ```
 % A. Utterance is a sentence
 	( phrase(sentence(Rule),UtteranceList),
