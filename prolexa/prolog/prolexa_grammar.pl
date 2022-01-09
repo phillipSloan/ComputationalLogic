@@ -57,7 +57,7 @@ sentence1([(not(L):-true)]) --> proper_noun(N,X),verb_phrase(N,not(X=>L)).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 
 % putting together response for if, then rule
-%sentence1(C) --> reverse_verb_phrase(N,M1), determiner_reverse(N,M1,M2,C),  noun(N,M2).
+% sentence1(C) --> reverse_verb_phrase(N,M1), determiner_reverse(N,M1,M2,C),  noun(N,M2).
 
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
@@ -79,7 +79,7 @@ property(p,M) --> noun(p,M).
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
 % determiner(p,X=>B,X=>H,[(H:-B)]) --> [].
-%determiner(p, sk=>H1, sk=>H2, [(H1:-true),(H2 :- true)]) -->[some].
+% determiner(p, sk=>H1, sk=>H2, [(H1:-true),(H2 :- true)]) -->[some].
 
 % operator for trailing determiner
 %determiner_reverse(s,X=>B,X=>H,[(H:-B)]) --> [then].
