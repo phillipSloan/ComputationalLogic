@@ -184,3 +184,5 @@ prolexa: donald is not happy
 user:  "is donald happy".
 prolexa: donald is not happy
 ```
+The assignment asks us to prove:
+> Every teacher is happy. Donald is not happy. Therefore, Donald is not a teacher.
