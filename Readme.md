@@ -43,17 +43,17 @@ question1(not(Q)) --> [is],proper_noun(N,X),verb_phrase(N,not(X=>Q)).
 ---
 We can now handle phrases like "Donald is not happy", but they have no bearing with respect to reasoning. This can be observed if we input some conflicting information:
 
+```
+user: "tell me everything".
+prolexa: I know nothing
 
-> user: "tell me everything".
-> prolexa: I know nothing
+user: "donald is happy".
+prolexa: I will remember that donald is happy
 
-> user: "donald is happy".
-> prolexa: I will remember that donald is happy
-
-> user: "donald is not happy".
-> prolexa: I will remember that donald is not happy
-> user: "tell me everything".
-> prolexa: donald is happy. donald is not happy
+user: "donald is not happy".
+prolexa: I will remember that donald is not happy
+user: "tell me everything".
+prolexa: donald is happy. donald is not happy
 
 Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a predicate which removes conflicting rules to prolexa_engine.pl :
 ```
