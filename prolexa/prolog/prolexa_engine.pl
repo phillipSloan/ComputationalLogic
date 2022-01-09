@@ -118,7 +118,6 @@ prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 
-
 %prove_rb(not A,Rulebase,P0,P):-
 %  find_clause((A:-B),Rule,Rulebase),
 %	prove_rb(not B,Rulebase,[p( not A,Rule)|P0],P).

@@ -18,8 +18,10 @@ iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
 % unary predicates for adjectives, nouns and verbs
 pred(human,   1,[a/human,n/human]).
 pred(mortal,  1,[a/mortal,n/mortal]).
+pred(immortal,  1,[a/immortal,n/immortal]).
 % Added for negation
 pred(happy,   1,[a/happy]).
+
 pred(teacher, 1,[n/teacher]).
 pred(student, 1,[n/student]).
 
