@@ -113,6 +113,11 @@ prove_rb(A,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
 
+%for double negatives
+prove_rb(not(not(A)),Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+
 % Added to allow negation to work
 prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
