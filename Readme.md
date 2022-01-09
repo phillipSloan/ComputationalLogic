@@ -54,7 +54,7 @@ user: "donald is not happy".
 prolexa: I will remember that donald is not happy
 user: "tell me everything".
 prolexa: donald is happy. donald is not happy
-
+```
 Prolexa cannot recognise the confliction between donald being happy and unhappy ("not happy") at the same time. To enable this we need to apply a predicate which removes conflicting rules to prolexa_engine.pl :
 ```
 remove_conflicting_rules([Head:-Body]):-
@@ -122,13 +122,17 @@ prove_question(Query,SessionId,Answer):-
         transform(Query,Clauses),
         phrase(sentence(Clauses),AnswerAtomList),
         atomics_to_string(AnswerAtomList," ",Answer)
+```
+```ruby
     ; prove_rb(not Query,Rulebase) ->
         transform(not Query,Clauses),
         phrase(sentence(Clauses),AnswerAtomList),
         atomics_to_string(AnswerAtomList," ",Answer)
+```
+```
     ; Answer = 'Sorry, I don\'t think this is the case'
     ).
-
+    
 % two-argument version that can be used in maplist/3 (see all_answers/2)
 prove_question(Query,Answer):-
 	findall(R,prolexa:stored_rule(_SessionId,R),Rulebase),
@@ -136,10 +140,14 @@ prove_question(Query,Answer):-
 		transform(Query,Clauses),
 		phrase(sentence(Clauses),AnswerAtomList),
 		atomics_to_string(AnswerAtomList," ",Answer)
+```
+```ruby
 	; prove_rb(not Query,Rulebase) ->
 			transform(not Query,Clauses),
 			phrase(sentence(Clauses),AnswerAtomList),
 			atomics_to_string(AnswerAtomList," ",Answer)
+```
+```
 	; Answer = ""
 	).
 
@@ -153,12 +161,16 @@ explain_question(Query,SessionId,Answer):-
 		atomic_list_concat([therefore|L]," ",Last),
 		append(Msg,[Last],Messages),
 		atomic_list_concat(Messages,"; ",Answer)
+```
+```ruby
 	; prove_rb(not(Query),Rulebase,[],Proof) ->
 		maplist(pstep2message,Proof,Msg),
 		phrase(sentence1([(not(Query):-true)]),L),
 		atomic_list_concat([therefore|L]," ",Last),
 		append(Msg,[Last],Messages),
 		atomic_list_concat(Messages," ; ",Answer)
+```
+```
 	; Answer = 'Sorry, I don\'t think this is the case'
 	).
 
