@@ -230,4 +230,20 @@ prove_rb(not B,Rulebase,P0,P):-
 	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 ```
 
-
+Double negatives
+Is donald not happy example
+```
+%for double negatives
+prove_rb(not(not(A)),Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+```
+Extend transform to understand double negatives for answering
+```
+% transform instantiated, possibly conjunctive, query to list of clauses
+transform((A,B),[(A:-true)|Rest]):-!,
+    transform(B,Rest).
+transform(not(not(A)),B):-!,
+	transform(A,B).
+transform(A,[(A:-true)]).
+```
