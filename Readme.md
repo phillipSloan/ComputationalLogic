@@ -113,6 +113,14 @@ prolexa: I will remember that donald is not happy
 user: "is donald happy"
 prolexa: Sorry, I don't think this is the case
 ```
+and 
+```
+user: "donald is happy".
+prolexa: I will remember that donald is not happy
+
+user: "is donald not happy"
+prolexa: Sorry, I don't think this is the case
+```
 The question answering engine will attempt to prove the query, and if it cannot will provide a response indicating that the answer is not found in the knowledge base ("Sorry, I don't..."). 
 
 However, in this case, clearly "Is donald happy?" should have an answer as we know that Donald is not happy. To remedy this, we add an extra step in the question answering process to check if the negative of a query can be proven. 
@@ -182,7 +190,7 @@ explain_question(Query,SessionId,Answer):-
 
 
 ```
-Prolog can now handle our earlier example with a correct answer:
+Prolog can now handle our first example with a correct answer:
 ```
 user: "tell me everything".
 prolexa: donald is not happy
@@ -190,6 +198,41 @@ prolexa: donald is not happy
 user:  "is donald happy".
 prolexa: donald is not happy
 ```
+However, the second example still fails:
+```
+user: "tell me everything".
+prolexa: donald is happy
+
+user:  "is donald not happy".
+prolexa: Sorry, I don't think this is the case
+```
+Investigating the issue, it becomes apparent that this type of question passes double negative queries to prolexa's question answering engine, so we need to extend the meta-interpreter to understand that 
+> not(not(A)) --> A
+We add the following to prove_rb:
+```
+%for double negatives
+prove_rb(not(not(A)),Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+```
+Prolog can now reason with double negatives, but we need to adapt the transform predicate to simplify double negatives to positives for answer generation:
+```
+% transform instantiated, possibly conjunctive, query to list of clauses
+transform((A,B),[(A:-true)|Rest]):-!,
+    transform(B,Rest).
+transform(not(not(A)),B):-!,
+	transform(A,B).
+transform(A,[(A:-true)]).
+```
+We can now interpret and respond to negated questions such as "Is donald not happy":
+```
+user: "tell me everything".
+prolexa: donald is happy
+
+user:  "is donald not happy".
+prolexa: donald is happy
+```
+
 The assignment asks us to prove:
 > Every teacher is happy. Donald is not happy. Therefore, Donald is not a teacher.
 
