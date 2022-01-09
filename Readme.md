@@ -1,5 +1,3 @@
-# Insert colab link
-
 ## 2021 Computational Logic for Artificial Intelligence Coursework
 ##### Phillip Sloan and Jonathan Erskine
 
