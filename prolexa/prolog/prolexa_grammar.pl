@@ -104,8 +104,8 @@ question1(Q) --> [who],verb_phrase(s,_X=>Q).
 % This allows "who is not a <noun>" to be answered
 question1(not(Q)) --> [who],verb_phrase(s,not(_X=>Q)).
 question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
-% question1(not(Q)) --> [is],proper_noun(N,X),verb_phrase(N,not(X=>Q)).
-question1(not(Q)) --> [is], proper_noun(N,X), [not], property(N,X=>Q).
+question1(not(Q)) --> [is],proper_noun(N,X), [not], verb_phrase(N,not(X=>Q)).
+% question1(not(Q)) --> [is], proper_noun(N,X), [not], property(N,X=>Q).
 
 question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
 %question1((Q1,Q2)) --> [are,some],noun(p,sk=>Q1),
