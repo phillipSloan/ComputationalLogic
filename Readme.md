@@ -207,7 +207,9 @@ user:  "is donald not happy".
 prolexa: Sorry, I don't think this is the case
 ```
 Investigating the issue, it becomes apparent that this type of question passes double negative queries to prolexa's question answering engine, so we need to extend the meta-interpreter to understand that 
+
 > not(not(A)) --> A
+
 We add the following to prove_rb:
 ```
 %for double negatives
