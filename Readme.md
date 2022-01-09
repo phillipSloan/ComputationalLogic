@@ -117,7 +117,7 @@ This requires modification of prove_question/2, prove_question/3 and explain_que
 %%% Main question-answering engine adapted from nl_shell.pl %%%
 
 prove_question(Query,SessionId,Answer):-
-    findall(R,prolexa:stored_rule(SessionId,R),Rulebase),     % create a list of all the rules and store them in RuleBase
+    findall(R,prolexa:stored_rule(SessionId,R),Rulebase),
     ( prove_rb(Query,Rulebase) ->
         transform(Query,Clauses),
         phrase(sentence(Clauses),AnswerAtomList),
