@@ -5,7 +5,7 @@ This repository contains the code required to extend the reasoning capabilities 
 
 A notebook containing a thorough description of the changes is provided via the Google Colab notebook.  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipsloan/ComputationalLogic/blob/prolexa-plus/CourseworkNotebook.ipynb)
 
-Changes/modifications to the default prolexa code are as given below for each file which is modified. After modification, prolexa can handle the following queries:
+Changes/modifications to the default prolexa code are as given below for each file which is modified. After modification, prolexa can handle the following query:
 > user: donald is not happy
 
 > user: every teacher is happy
