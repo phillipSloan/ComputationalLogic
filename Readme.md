@@ -176,3 +176,11 @@ explain_question(Query,SessionId,Answer):-
 
 
 ```
+Prolog can now handle our earlier example with a correct answer:
+```
+user: "tell me everything".
+prolexa: donald is not happy
+
+user:  "is donald happy".
+prolexa: donald is not happy
+```
