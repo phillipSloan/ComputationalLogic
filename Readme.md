@@ -3,7 +3,9 @@
 
 ## Authors [Phillip Sloan](https://github.com/phillipSloan) and [Jonathan Erksine](https://github.com/jmerskine1)
 
-A notebook containing a thorough description of the changes is provided via the Google Colab notebook: [![Open Report In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipSloan/ComputationalLogic/blob/prolexa-plus/Report%20Notebook.ipynb) 
+A notebook containing a thorough description of the changes is provided via the Google Colab notebook: 
+
+[![Open Report In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipSloan/ComputationalLogic/blob/prolexa-plus/Report%20Notebook.ipynb) 
 
 This repository contains the code required to extend the reasoning capabilities of prolexa to cover negation. Prolexa can handle the following query:
 
