@@ -68,7 +68,7 @@ conflicting_not_rules(not(Head):-Body):-
 conflicting_not_rules(Head:-not(Body)):-
 	retractall(prolexa:stored_rule(_,[(Head:-Body)])).
 ```
-This new function searching the current rulebase for rules which are in direct conflict with a newly instantiated rule and removes them from the rulebase. This function is called from prolexa.pl when a new rule is added.
+This new function takes a rule and searches the current rulebase to remove any which are in direct conflict. This function is called from prolexa.pl when a new rule is added.
 ```
 % A. Utterance is a sentence
 	( phrase(sentence(Rule),UtteranceList),
@@ -77,7 +77,7 @@ This new function searching the current rulebase for rules which are in direct c
 			atomic_list_concat(['I already knew that',Utterance],' ',Answer)
 	  ; otherwise -> % A2. It doesn't follow, so add to stored rules
 ```
-```
+```ruby
 		        remove_conflicting_rules(Rule),
 ```
 ```
@@ -85,7 +85,7 @@ This new function searching the current rulebase for rules which are in direct c
 			atomic_list_concat(['I will remember that',Utterance],' ',Answer)
 	  )
 ```
-This can be observed by the following:
+Removal of conflicting rules can be observed by the following:
 ```
 user: "forget everything".
 prolexa: I am a blank slate
@@ -107,6 +107,60 @@ prolexa: I will remember that donald is not happy
 user: "is donald happy"
 prolexa: Sorry, I don't think this is the case
 ```
-The question answering engine will attempt to prove the query, and if it cannot will provide a response indicating that the answer is not found in the knowledge base ("Sorry, I don't..."). However, in this case, clearly "Is donald happy?" should have an answer as we know that Donald is not happy. To remedy this, we add an extra step in the question answering process to check if the negative of a query can be proven. 
+The question answering engine will attempt to prove the query, and if it cannot will provide a response indicating that the answer is not found in the knowledge base ("Sorry, I don't..."). 
+
+However, in this case, clearly "Is donald happy?" should have an answer as we know that Donald is not happy. To remedy this, we add an extra step in the question answering process to check if the negative of a query can be proven. 
+
+This requires modification of prove_question/2, prove_question/3 and explain_question within prolog_engine.pl
+
+```
+%%% Main question-answering engine adapted from nl_shell.pl %%%
+
+prove_question(Query,SessionId,Answer):-
+    findall(R,prolexa:stored_rule(SessionId,R),Rulebase),     % create a list of all the rules and store them in RuleBase
+    ( prove_rb(Query,Rulebase) ->
+        transform(Query,Clauses),
+        phrase(sentence(Clauses),AnswerAtomList),
+        atomics_to_string(AnswerAtomList," ",Answer)
+    ; prove_rb(not Query,Rulebase) ->
+        transform(not Query,Clauses),
+        phrase(sentence(Clauses),AnswerAtomList),
+        atomics_to_string(AnswerAtomList," ",Answer)
+    ; Answer = 'Sorry, I don\'t think this is the case'
+    ).
+
+% two-argument version that can be used in maplist/3 (see all_answers/2)
+prove_question(Query,Answer):-
+	findall(R,prolexa:stored_rule(_SessionId,R),Rulebase),
+	( prove_rb(Query,Rulebase) ->
+		transform(Query,Clauses),
+		phrase(sentence(Clauses),AnswerAtomList),
+		atomics_to_string(AnswerAtomList," ",Answer)
+	; prove_rb(not Query,Rulebase) ->
+			transform(not Query,Clauses),
+			phrase(sentence(Clauses),AnswerAtomList),
+			atomics_to_string(AnswerAtomList," ",Answer)
+	; Answer = ""
+	).
 
 
+%%% Extended version of prove_question/3 that constructs a proof tree %%%
+explain_question(Query,SessionId,Answer):-
+	findall(R,prolexa:stored_rule(SessionId,R),Rulebase),
+	( prove_rb(Query,Rulebase,[],Proof) ->
+		maplist(pstep2message,Proof,Msg),
+		phrase(sentence1([(Query:-true)]),L),
+		atomic_list_concat([therefore|L]," ",Last),
+		append(Msg,[Last],Messages),
+		atomic_list_concat(Messages,"; ",Answer)
+	; prove_rb(not(Query),Rulebase,[],Proof) ->
+		maplist(pstep2message,Proof,Msg),
+		phrase(sentence1([(not(Query):-true)]),L),
+		atomic_list_concat([therefore|L]," ",Last),
+		append(Msg,[Last],Messages),
+		atomic_list_concat(Messages," ; ",Answer)
+	; Answer = 'Sorry, I don\'t think this is the case'
+	).
+
+
+```
