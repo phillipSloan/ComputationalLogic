@@ -1,7 +1,12 @@
+# Insert colab link
+
 ## 2021 Computational Logic for Artificial Intelligence Coursework
 ##### Philip Sloan and Jonathan Erskine
 
+### Introduction
 In this coursework we attempt to extend the reasoning capabilities of Prolexa to include negation.
+
+This README demonstrates our approach to this assignment, walking through how we implemented negation and other command line code. It seeks to explain our thought process, which was wrong at certain points, causing unwanted proofs from the meta-interpreter. There are several snippets of code throughout this report of how our code was created, with the Colab notebook demonstrating the final implementation. A link to it can be found at the top of this README.
 
 ### Negation
 
@@ -246,7 +251,7 @@ prolexa: donald is not happy. every teacher is happy
 user: "is donald a teacher".
 prolexa: Sorry, I don't think this is the case
 ```
-Clearly, there is an issue with the method of explanation. If donald is happy, then we can not say for certain whether he is or is not a teacher. However, knowing that donald is not happy confirms that he cannot be a teacher, as all teachers are happy. 
+Clearly, our reasoning methods are still falling short. If donald is happy, then we can not say for certain whether he is or is not a teacher. However, knowing that donald is not happy confirms that he cannot be a teacher, as all teachers are happy. 
 
 Whereas for a positive term, e.g. teacher(donald) the proof tree will do X, search for any set of rules and ground truths which indicate that donald is a teacher e.g. 
 > teacher(donald):-true 
@@ -274,21 +279,4 @@ prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 ```
-
-Double negatives
-Is donald not happy example
-```
-%for double negatives
-prove_rb(not(not(A)),Rulebase,P0,P):-
-  find_clause((A:-B),Rule,Rulebase),
-	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
-```
-Extend transform to understand double negatives for answering
-```
-% transform instantiated, possibly conjunctive, query to list of clauses
-transform((A,B),[(A:-true)|Rest]):-!,
-    transform(B,Rest).
-transform(not(not(A)),B):-!,
-	transform(A,B).
-transform(A,[(A:-true)]).
-```
+We can now infer that donald is not a teacher, demonstrating an extension of the capability of prolexa to reason using negation.
