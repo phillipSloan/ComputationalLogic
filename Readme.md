@@ -1,7 +1,12 @@
+# Insert colab link
+
 ## 2021 Computational Logic for Artificial Intelligence Coursework
 ##### Philip Sloan and Jonathan Erskine
 
+### Introduction
 In this coursework we attempt to extend the reasoning capabilities of Prolexa to include negation.
+
+This README demonstrates our approach to this assignment, walking through how we implemented negation and other command line code. It seeks to explain our thought process, which was wrong at certain points, causing unwanted proofs from the meta-interpreter. There are several snippets of code throughout this report of how our code was created, with the Colab notebook demonstrating the final implementation. A link to it can be found at the top of this README.
 
 ### Negation
 
@@ -14,7 +19,7 @@ To implement negation grammatically we have to modify prolexa_grammar.pl to defi
 ```
 :-op(900,fy,not).
 ```
-```
+```prolog
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
 verb_phrase(s,not(M)) --> [not],property(s,M).
@@ -113,6 +118,14 @@ prolexa: I will remember that donald is not happy
 user: "is donald happy"
 prolexa: Sorry, I don't think this is the case
 ```
+and 
+```
+user: "donald is happy".
+prolexa: I will remember that donald is not happy
+
+user: "is donald not happy"
+prolexa: Sorry, I don't think this is the case
+```
 The question answering engine will attempt to prove the query, and if it cannot will provide a response indicating that the answer is not found in the knowledge base ("Sorry, I don't..."). 
 
 However, in this case, clearly "Is donald happy?" should have an answer as we know that Donald is not happy. To remedy this, we add an extra step in the question answering process to check if the negative of a query can be proven. 
@@ -182,7 +195,7 @@ explain_question(Query,SessionId,Answer):-
 
 
 ```
-Prolog can now handle our earlier example with a correct answer:
+Prolog can now handle our first example with a correct answer:
 ```
 user: "tell me everything".
 prolexa: donald is not happy
@@ -190,6 +203,43 @@ prolexa: donald is not happy
 user:  "is donald happy".
 prolexa: donald is not happy
 ```
+However, the second example still fails:
+```
+user: "tell me everything".
+prolexa: donald is happy
+
+user:  "is donald not happy".
+prolexa: Sorry, I don't think this is the case
+```
+Investigating the issue, it becomes apparent that this type of question passes double negative queries to prolexa's question answering engine, so we need to extend the meta-interpreter to understand that 
+
+> not(not(A)) --> A
+
+We add the following to prove_rb:
+```
+%for double negatives
+prove_rb(not(not(A)),Rulebase,P0,P):-
+  find_clause((A:-B),Rule,Rulebase),
+	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
+```
+Prolog can now reason with double negatives, but we need to adapt the transform predicate to simplify double negatives to positives for answer generation:
+```
+% transform instantiated, possibly conjunctive, query to list of clauses
+transform((A,B),[(A:-true)|Rest]):-!,
+    transform(B,Rest).
+transform(not(not(A)),B):-!,
+	transform(A,B).
+transform(A,[(A:-true)]).
+```
+We can now interpret and respond to negated questions such as "Is donald not happy":
+```
+user: "tell me everything".
+prolexa: donald is happy
+
+user:  "is donald not happy".
+prolexa: donald is happy
+```
+
 The assignment asks us to prove:
 > Every teacher is happy. Donald is not happy. Therefore, Donald is not a teacher.
 
@@ -201,7 +251,7 @@ prolexa: donald is not happy. every teacher is happy
 user: "is donald a teacher".
 prolexa: Sorry, I don't think this is the case
 ```
-Clearly, there is an issue with the method of explanation. If donald is happy, then we can not say for certain whether he is or is not a teacher. However, knowing that donald is not happy confirms that he cannot be a teacher, as all teachers are happy. 
+Clearly, our reasoning methods are still falling short. If donald is happy, then we can not say for certain whether he is or is not a teacher. However, knowing that donald is not happy confirms that he cannot be a teacher, as all teachers are happy. 
 
 Whereas for a positive term, e.g. teacher(donald) the proof tree will do X, search for any set of rules and ground truths which indicate that donald is a teacher e.g. 
 > teacher(donald):-true 
@@ -229,5 +279,4 @@ prove_rb(not B,Rulebase,P0,P):-
   find_clause((A:-B),Rule,Rulebase),
 	prove_rb(not A,Rulebase,[p(not B,Rule)|P0],P).
 ```
-
-
+We can now infer that donald is not a teacher, demonstrating an extension of the capability of prolexa to reason using negation.
