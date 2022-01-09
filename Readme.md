@@ -3,19 +3,19 @@
 
 ## Authors [Phillip Sloan](https://github.com/phillipSloan) and [Jonathan Erksine](https://github.com/jmerskine1)
 
-This repository contains the code required to extend the reasoning capabilities of prolexa to negation.
-
 A notebook containing a thorough description of the changes is provided via the Google Colab notebook: [![Open Report In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipSloan/ComputationalLogic/blob/prolexa-plus/Report%20Notebook.ipynb) 
 
-Changes/modifications to the default prolexa code are as given below for each file which is modified. After modification, prolexa can handle the following query:
+This repository contains the code required to extend the reasoning capabilities of prolexa to cover negation. Prolexa can handle the following query:
+
 > user: donald is not happy
-
+> 
 > user: every teacher is happy
-
+> 
 > user: explain why donald is not a teacher
-
+> 
 > prolexa: donald is not happy; every teacher is happy; therefore donald is not a teacher
 
+Changes/modifications to the default prolexa code are as given below for each file which is modified.
 
 ### prolexa_grammar.pl
 
