@@ -142,6 +142,8 @@ find_clause(Clause,Rule,[_Rule|Rules]):-
 % transform instantiated, possibly conjunctive, query to list of clauses
 transform((A,B),[(A:-true)|Rest]):-!,
     transform(B,Rest).
+transform(not(not(A)),B):-!,
+	transform(A,B).
 transform(A,[(A:-true)]).
 
 
