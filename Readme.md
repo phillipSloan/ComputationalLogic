@@ -5,10 +5,15 @@
 
 This repository contains the code required to extend the reasoning capabilities of prolexa to negation.
 
-A notebook containing a thorough description of the changes is provided via the link at the top of this readme. Changes/modifications to the default prolexa code are as given below for each file which is modified. After modification, prolexa can now handle the following:
+A notebook containing a thorough description of the changes is provided via the Google Colab notebook.  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/phillipsloan/ComputationalLogic/CourseworkNotebook.ipynb)
+
+Changes/modifications to the default prolexa code are as given below for each file which is modified. After modification, prolexa can handle the following queries:
 > user: donald is not happy
+
 > user: every teacher is happy
+
 > user: is donald a teacher
+
 > prolexa: donald is not a teacher
 
 
