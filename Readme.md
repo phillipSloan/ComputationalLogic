@@ -19,7 +19,7 @@ To implement negation grammatically we have to modify prolexa_grammar.pl to defi
 ```
 :-op(900,fy,not).
 ```
-```
+```prolog
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(s,not(M)) --> [is],[not],property(s,M).
 verb_phrase(s,not(M)) --> [not],property(s,M).
