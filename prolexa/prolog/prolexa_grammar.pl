@@ -62,11 +62,11 @@ sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 % sentence1(C) --> inv_verb_phrase(N,M1), inv_determiner(N,M1,M2,C),  noun(N,M2).
 
 verb_phrase(s,M) --> [is],property(s,M).
-verb_phrase(s,not(M)) --> [is],[not],property(s,M).
+verb_phrase(s,not(M)) --> [is,not],property(s,M).
 verb_phrase(s,not(M)) --> [not],property(s,M).
 
 verb_phrase(p,M) --> [are],property(p,M).
-% verb_phrase(p,not(M)) --> [are],[not],property(p,M).
+% verb_phrase(p,not(M)) --> [are,not],property(p,M).
 
 verb_phrase(N,M) --> iverb(N,M).
 
